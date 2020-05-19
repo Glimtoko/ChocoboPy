@@ -19,7 +19,7 @@ $(SO_NAME): lagrangian_hydro.pyx
 
 exe: dist/chocobopy
 
-dist/chocobopy: $(SO_NAME)0                                    $(PYFILES)
+dist/chocobopy: $(SO_NAME) $(PYFILES)
 	pyinstaller --onefile chocobopy.py
 
 install: dist/chocobopy
