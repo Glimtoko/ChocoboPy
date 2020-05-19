@@ -1,7 +1,7 @@
 import math
 import numpy
 
-import inputs
+#import inputs
 
 cimport numpy
 cimport cython
@@ -142,7 +142,8 @@ def set_soundspeed(
     numpy.ndarray[DTYPE_t, ndim=1] pressure,
     numpy.ndarray[DTYPE_t, ndim=1] rho,
     numpy.ndarray[DTYPE_t, ndim=1] soundspeed,
-    numpy.ndarray[ITYPE_t, ndim=1] material
+    numpy.ndarray[ITYPE_t, ndim=1] material,
+    gamma_dict
 ):
     cdef int ncells = pressure.size
     cdef double gamma = 0
@@ -152,7 +153,7 @@ def set_soundspeed(
         if rho[i] < 0.0 or pressure[i] < 0.0:
             soundspeed[i] = 0.0
         else:
-            gamma = inputs.gamma[material[i]]
+            gamma = gamma_dict[material[i]]
             soundspeed[i] =(gamma*pressure[i]/rho[i])**0.5
 
 
@@ -163,13 +164,15 @@ def get_q(
     numpy.ndarray[DTYPE_t, ndim=1] soundspeed,
     numpy.ndarray[DTYPE_t, ndim=1] divv,
     numpy.ndarray[DTYPE_t, ndim=1] area,
-    numpy.ndarray[DTYPE_t, ndim=1] q
+    numpy.ndarray[DTYPE_t, ndim=1] q,
+    double cq,
+    double cl
 ):
     cdef int ncells = rho.size
     cdef double dudx
     
-    cdef double CQ = inputs.CQ
-    cdef double CL = inputs.CL
+    cdef double CQ = cq
+    cdef double CL = cl
     
     cdef int i
     for i in prange(ncells, nogil=True):
@@ -188,7 +191,11 @@ def get_dt(
     numpy.ndarray[DTYPE_t, ndim=1] rho,
     numpy.ndarray[DTYPE_t, ndim=1] q, 
     double dtold, 
-    double time
+    double time,
+    double t0,
+    double dtmax,
+    double dtinit,
+    double growth
 ):
     cdef int ncells = area.size
     cdef numpy.ndarray[DTYPE_t, ndim=1] delta_t = numpy.zeros(ncells)
@@ -196,6 +203,7 @@ def get_dt(
     cdef double dtmin = 1.0
     cdef double dt = 0.0
     cdef int control = 0
+    cdef double rhocutoff = 1.0e-6
     
     for i in range(ncells):
         if area[i] < 0.0:
@@ -203,18 +211,18 @@ def get_dt(
             delta_t[i] = 9999.9
         else:
             delta_t[i] = math.sqrt(
-                area[i]/max(inputs.rhocutoff, soundspeed[i]**2 + 2.0*q[i]/rho[i])
+                area[i]/max(rhocutoff, soundspeed[i]**2 + 2.0*q[i]/rho[i])
             )/2.0
         
         if delta_t[i] < dtmin:
             dtmin = delta_t[i]
             control = i
     
-    if time <= inputs.t0:
-        dt = min(dtmin, inputs.dtmax, inputs.dtinit)
+    if time <= t0:
+        dt = min(dtmin, dtmax, dtinit)
     else:
-        dt = min(dtmin, inputs.dtmax, dtold*inputs.growth)
-        if dt == dtold*inputs.growth:
+        dt = min(dtmin, dtmax, dtold*growth)
+        if dt == dtold*growth:
             control = -1
     
     return dt, control

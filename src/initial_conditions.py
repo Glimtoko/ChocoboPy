@@ -26,15 +26,17 @@ def set_initial_conditions_sod(mesh):
         if xbubble**2.0 + ybubble**2.0 <= 0.4**2.0 + 0.000001:
             mesh.ρ[index] = 1.0
             mesh.pressure[index] = 1.0
+            
+    return [1.4, ]
 
 def set_initial_conditions(eos_file, mesh):
-    import inputs
+    # import inputs
     
     # Initial velocities
     mesh.velocities.u.fill(0.0)
     mesh.velocities.v.fill(0.0)
     
-    inputs.gamma = {}
+    gamma_dict = {}
     # Read EOS data
     mat_data = {}
     with open(eos_file, "r") as efile:
@@ -53,8 +55,10 @@ def set_initial_conditions(eos_file, mesh):
     print(mat_data)
     
     for mat in mat_data.keys():
-        inputs.gamma[mat] = mat_data[mat]["gamma"]
+        gamma_dict[mat] = mat_data[mat]["gamma"]
         for index in range(mesh.ncells):
             if mesh.material[index] == mat:
                 mesh.ρ[index] = mat_data[mat]["rho"]
                 mesh.pressure[index] = mat_data[mat]["P"]
+                
+    return gamma_dict

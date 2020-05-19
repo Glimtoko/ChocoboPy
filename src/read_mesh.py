@@ -31,10 +31,17 @@ def get_mesh_size(filename):
     return nnodes, ncells
         
 
-def read_mesh(filename, boundaries, material_list, mesh):
+def read_mesh(filename, material_list, mesh):
     """
     Reads the mesh
     """
+    boundary_values = {
+        "XLOW": -1,
+        "XHIGH": -1,
+        "YLOW": -2,
+        "YHIGH": -2,
+    }
+    
     innodelist = False
     incelllist = False
     inbcs = False
@@ -86,7 +93,7 @@ def read_mesh(filename, boundaries, material_list, mesh):
                     elif "*" not in line:
                         nodes = [int(n)-1 for n in line.split(",")]
                         for node in nodes:
-                            mesh.bc.type[node] += boundaries[bc]
+                            mesh.bc.type[node] += boundary_values[bc]
                             
             # Detect start of nodelist
             if "*NODE" in line:

@@ -1,8 +1,13 @@
-def output_text(mesh, time):
+def output_text(mesh, time, location="results"):
+    import os
+    
+    if not os.access(location, os.R_OK):
+        os.mkdir(location)
+    
     output_text.count += 1
     
     # Physical Quantities
-    name = "results/mypre_no{:03d}.txt".format(output_text.count)
+    name = "{}/mypre_no{:03d}.txt".format(location, output_text.count)
     with open(name, "w") as io:
         for i in range(mesh.ncells):
             line = "{:6d}  {:17.12f}  {:17.12f}  {:19.12f}\n".format(
@@ -10,7 +15,7 @@ def output_text(mesh, time):
             )
             io.write(line)
     
-    name = "results/myvel_no{:03d}.txt".format(output_text.count)
+    name = "{}/myvel_no{:03d}.txt".format(location, output_text.count)
     with open(name, "w") as io:
         for i in range(mesh.nnodes):
             line = "{:17.12f}  {:17.12f}  {:17.12f}\n".format(
@@ -18,7 +23,7 @@ def output_text(mesh, time):
             )
             io.write(line)   
     
-    name = "results/myx_no{:03d}.txt".format(output_text.count)
+    name = "{}/myx_no{:03d}.txt".format(location, output_text.count)
     with open(name, "w") as io:
         for i in range(mesh.nnodes):
             line = "{:17.12f}  {:17.12f}\n".format(
@@ -26,7 +31,7 @@ def output_text(mesh, time):
             )
             io.write(line)
     
-    name = "results/nodelist_no{:03d}.txt".format(output_text.count)
+    name = "{}/nodelist_no{:03d}.txt".format(location, output_text.count)
     with open(name, "w") as io:
         for i in range(mesh.ncells):
             line = "{:6d}  {:6d}  {:6d}  {:6d}\n".format(

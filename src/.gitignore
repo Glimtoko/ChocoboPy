@@ -1,5 +1,7 @@
 __pycache__/
+results/
 build/
 chocobopy.spec
 dist/
 lagrangian_hydro.cpython-37m-x86_64-linux-gnu.so
+lagrangian_hydro.c
