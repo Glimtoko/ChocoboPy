@@ -12,7 +12,7 @@ import eos
 import output
  
 
-def chocobopy(meshfile, eosfile, controlfile, usehcmesh):  
+def chocobopy(meshfile, eosfile, controlfile, usehcmesh, outputloc):  
     inputs = user_input.Inputs()
     inputs.read_input(controlfile)
     
@@ -196,7 +196,7 @@ def chocobopy(meshfile, eosfile, controlfile, usehcmesh):
         eos.perfect_gas(mesh.energy, mesh.ρ, mesh.pressure, mesh.material, gamma)
         
         if (time >= 0.2 and not output_dumped) or inputs.debug_step_count > 0:
-            output.output_text(mesh, time)
+            output.output_text(mesh, time, outputloc)
             output_dumped = True
         
         if step == inputs.debug_step_count:
@@ -234,6 +234,13 @@ if __name__ == "__main__":
         default="inputs.in", 
         help="File containing input (control) data"
     )
+
+    parser.add_argument(
+        "--output", "-o",
+        dest="outputloc",
+        default="results", 
+        help="Directory to put results in. Will be created if necessary"
+    )
     
     parser.add_argument(
         "--usehc",
@@ -249,4 +256,7 @@ if __name__ == "__main__":
 
     usehcmesh = False
     
-    chocobopy(args.meshfile, args.eosfile, args.controlfile, args.usehcmesh)
+    chocobopy(
+        args.meshfile, args.eosfile, args.controlfile, args.usehcmesh,
+        args.outputloc
+    )
