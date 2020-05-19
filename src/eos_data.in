@@ -1,0 +1,5 @@
+# Format
+# Mat number, rho0, P0, gamma
+1, 1, 1, 1.4
+2, 0.125, 0.1, 1.4
+
