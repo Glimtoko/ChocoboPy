@@ -211,13 +211,14 @@ def chocobopy(meshfile, eosfile, controlfile, usehcmesh, outputloc):
 
 if __name__ == "__main__":
     import argparse
+    import os
     
     parser = argparse.ArgumentParser(description="ChocoboPy CFD Code")
     
     parser.add_argument(
         "--mesh", "-m",
         dest="meshfile",
-        default="sod.key", 
+        default="mesh.key", 
         help="File containing mesh"
     )
     
@@ -236,6 +237,14 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--problem", "-p",
+        dest="problem",
+        default=".", 
+        help="Problem name. ChocoboPy will expect data in a subdirectory "
+             "with this name"
+    )
+
+    parser.add_argument(
         "--output", "-o",
         dest="outputloc",
         default="results", 
@@ -249,14 +258,15 @@ if __name__ == "__main__":
         default=False, 
         help="Use hard-coded spherical Sod setup"
     )
-    
-    
-    
+        
     args = parser.parse_args()
+      
+    problem = args.problem
+    meshfile = os.path.join(problem, args.meshfile)
+    eosfile = os.path.join(problem, args.eosfile)
+    controlfile = os.path.join(problem, args.controlfile)
+    outputloc = os.path.join(problem, args.outputloc)
 
     usehcmesh = False
     
-    chocobopy(
-        args.meshfile, args.eosfile, args.controlfile, args.usehcmesh,
-        args.outputloc
-    )
+    chocobopy(meshfile, eosfile, controlfile, args.usehcmesh, outputloc)
